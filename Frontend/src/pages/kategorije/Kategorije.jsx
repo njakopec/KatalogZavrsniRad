@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
-import {  Container, Table } from "react-bootstrap";
+import {  Button, Container, Table } from "react-bootstrap";
 import KategorijaService from '../../services/KategorijaService';
+import { Link, useNavigate } from "react-router-dom";
+import {RoutesNames} from '../../constants'
 
 
 export default function Kategorije(){
     const [kategorije,setKategorije] = useState();
+    const navigate = useNavigate();
 
 
     async function dohvatiKategorije(){
@@ -22,17 +25,30 @@ export default function Kategorije(){
     },[]);
 
 
+    async function obrisiAsync(sifra){
+        const odgovor = await KategorijaService._delete(sifra);
+        if (odgovor.greska){
+            console.log(odgovor.poruka);
+            alert('Pogledaj konzolu');
+            return;
+        }
+        dohvatiKategorije();
+    }
 
+    function obrisi(sifra){
+        obrisiAsync(sifra);
+    }
 
     return (
 
         <Container>
-           
+           <Link to={RoutesNames.KATEGORIJE_NOVI}> Dodaj </Link>
             <Table striped bordered hover responsive>
                 <thead>
                     <tr>
                         <th>Naziv</th>
-                        <th>Datum od</th>  
+                        <th>Vrijedi od</th>  
+                        <th>Akcija</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -40,6 +56,20 @@ export default function Kategorije(){
                         <tr key={index}>
                             <td>{kategorija.naziv}</td>
                             <td>{kategorija.vrijediOd}</td>  
+                            <td>
+                                <Button 
+                                onClick={()=>obrisi(kategorija.sifra)}
+                                variant='danger'
+                                >
+                                    Obriši
+                                </Button>
+
+                                <Button 
+                                onClick={()=>navigate(`/kategorije/${kategorija.sifra}`)}
+                                >
+                                    Promjeni
+                                </Button>
+                            </td>
                         </tr>
                     ))}
                 </tbody>

@@ -25,6 +25,12 @@ namespace EdunovaAPP.Controllers
         {
             return new JsonResult(_context.Kategorije.ToList());
         }
+        [HttpGet]
+        [Route("{sifra:int}")]
+        public IActionResult GetBySifra(int sifra)
+        {
+            return new JsonResult(_context.Kategorije.Find(sifra));
+        }
 
         [HttpPost]
         public IActionResult Post(Kategorija kategorija)
