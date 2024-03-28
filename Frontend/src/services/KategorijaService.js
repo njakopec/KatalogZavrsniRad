@@ -53,7 +53,7 @@ async function getBySifra(sifra){
 }
 
 async function update(sifra,kategorija){
-    return await HttpService.delete(naziv + '/'+sifra,kategorija)
+    return await HttpService.put(naziv + '/'+sifra,kategorija)
     .then((odgovor)=>{
         //console.table(odgovor.data);
         return {greska: false, poruka: odgovor.data.poruka};
