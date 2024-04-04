@@ -1,9 +1,10 @@
 ﻿
 
-using EdunovaAPP.Models;
+
+using Backend.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace EdunovaAPP.Data
+namespace Backend.Data
 {
     public class EdunovaContext:DbContext
     {
@@ -13,6 +14,12 @@ namespace EdunovaAPP.Data
         }
 
         public DbSet<Kategorija> Kategorije { get; set; }
+        public DbSet<Proizvod> Proizvodi { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Proizvod>().HasOne(p => p.Kategorija);
+        }
 
     }
 }

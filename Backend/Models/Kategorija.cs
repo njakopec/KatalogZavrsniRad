@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace EdunovaAPP.Models
+namespace Backend.Models
 {
     public class Kategorija: Entitet
     {

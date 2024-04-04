@@ -1,70 +1,35 @@
-﻿using EdunovaAPP.Data;
-using EdunovaAPP.Models;
+﻿using System.Text;
+using Backend.Models;
+using Backend.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
-namespace EdunovaAPP.Controllers
+namespace Backend.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
-    public class KategorijeController
+    public class KategorijeController : EdunovaController<Kategorija, KategorijaDTORead, KategorijaDTOInsertUpdate>
     {
-        // Dependency injection
-        // Definiraš privatno svojstvo
-        private readonly EdunovaContext _context;
-
-        // Dependency injection
-        // U konstruktoru primir instancu i dodjeliš privatnom svojstvu
-        public KategorijeController(EdunovaContext context)
+        public KategorijeController(EdunovaContext context) : base(context)
         {
-            _context = context;
+            DbSet = _context.Kategorije;
         }
-
-
-        [HttpGet]
-        public IActionResult Get()
+        protected override void KontrolaBrisanje(Kategorija entitet)
         {
-            return new JsonResult(_context.Kategorije.ToList());
+            var lista = _context.Proizvodi
+                .Include(x => x.Kategorija)
+                .Where(x => x.Kategorija.Sifra == entitet.Sifra)
+                .ToList();
+            if (lista != null && lista.Count > 0)
+            {
+                StringBuilder sb = new();
+                sb.Append("Kategorija se ne može obrisati jer se na njoj nalaze proizvodi: ");
+                foreach (var e in lista)
+                {
+                    sb.Append(e.Naziv).Append(", ");
+                }
+                throw new Exception(sb.ToString()[..^2]); // umjesto sb.ToString().Substring(0, sb.ToString().Length - 2)
+            }
         }
-        [HttpGet]
-        [Route("{sifra:int}")]
-        public IActionResult GetBySifra(int sifra)
-        {
-            return new JsonResult(_context.Kategorije.Find(sifra));
-        }
-
-        [HttpPost]
-        public IActionResult Post(Kategorija kategorija)
-        {
-            _context.Kategorije.Add(kategorija);
-            _context.SaveChanges();
-            return new JsonResult(kategorija);
-        }
-
-        [HttpPut]
-        [Route("{sifra:int}")]
-        public IActionResult Put(int sifra, Kategorija kategorija)
-        {
-            var kategorijaIzBaze = _context.Kategorije.Find(sifra);
-            // za sada ručno, kasnije će doći Mapper
-            kategorijaIzBaze.Naziv = kategorija.Naziv;
-            kategorijaIzBaze.VrijediOd= kategorija.VrijediOd;
-
-            _context.Kategorije.Update(kategorijaIzBaze);
-            _context.SaveChanges();
-
-            return new JsonResult(kategorijaIzBaze);
-        }
-
-        [HttpDelete]
-        [Route("{sifra:int}")]
-        [Produces("application/json")]
-        public IActionResult Delete(int sifra)
-        {
-            var smjerIzBaze = _context.Kategorije.Find(sifra);
-            _context.Kategorije.Remove(smjerIzBaze);
-            _context.SaveChanges();
-            return new JsonResult(new { poruka="Obrisano"});
-        }
-
     }
 }
