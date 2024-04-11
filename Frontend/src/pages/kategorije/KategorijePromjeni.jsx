@@ -1,9 +1,11 @@
-import { Button, Col, Container, Form, Row } from "react-bootstrap";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Container, Form } from "react-bootstrap";
+import { useNavigate, useParams } from "react-router-dom";
 import { RoutesNames } from "../../constants";
-import KategorijaService from "../../services/KategorijaService";
+import Service from "../../services/KategorijaService";
 import { useState, useEffect  } from "react";
-
+import InputText from "../../components/InputText";
+import Akcije from "../../components/Akcije";
+import moment from "moment";
 
 export default function KategorijePromjeni(){
     const navigate = useNavigate();
@@ -11,81 +13,47 @@ export default function KategorijePromjeni(){
     const [kategorija, setKategorija] = useState({});
 
     async function ucitajKategorija(){
-        const odgovor = await KategorijaService.getBySifra(routeParams.sifra);
-        if (odgovor.greska){
-            console.log(odgovor.poruka);
-            alert('Pogledaj konzolu');
+        const odgovor = await Service.getBySifra('Kategorije',routeParams.sifra);
+        if(!odgovor.ok){
+            alert(Service.dohvatiPorukeAlert(odgovor.podaci));
             return;
         }
-        setKategorija(odgovor.poruka);
+        setKategorija(odgovor.podaci);
     }
 
     async function promjeni(kategorija){
-        const odgovor = await KategorijaService.update(routeParams.sifra,kategorija);
-        if (odgovor.greska){
-            console.log(odgovor.poruka);
-            alert('Pogledaj konzolu');
+        const odgovor = await Service.promjeni('Kategorije',routeParams.sifra,kategorija);
+        if(!odgovor.ok){
+            alert(Service.dohvatiPorukeAlert(odgovor.podaci));
             return;
         }
         navigate(RoutesNames.KATEGORIJE_PREGLED);
     }
 
-
-
     useEffect(()=>{
         ucitajKategorija();
     },[]);
 
-
-    function obradiSubmit(e){ // e predstavlja event
+    function obradiSubmit(e){ 
         e.preventDefault();
-
         const podaci = new FormData(e.target);
-
         promjeni({
-            naziv: podaci.get('naziv'),  // 'naziv' je name atribut u Form.Control
-            vrijediOd: podaci.get('vrijediOd')       
+            naziv: podaci.get('naziv'),  
+            vrijediOd: moment.utc(podaci.get('vrijediOd'))  
         });
-
     }
 
     return (
-
         <Container>
             <Form onSubmit={obradiSubmit}>
-
-                <Form.Group controlId="naziv">
-                    <Form.Label>Naziv</Form.Label>
-                    <Form.Control type="text" name="naziv" 
-                    defaultValue={kategorija.naziv}
-                    required />
-                </Form.Group>
-
-                <Form.Group controlId="vrijediOd">
+                <InputText atribut='naziv' vrijednost={kategorija.naziv} />
+                <Form.Group>
                     <Form.Label>Vrijedi od</Form.Label>
-                    <Form.Control type="text" name="vrijediOd" 
-                    defaultValue={kategorija.vrijediOd}
-                     />
+                    <Form.Control type="date" name="vrijediOd" defaultValue={kategorija.vrijediOd} />
                 </Form.Group>
-
-              
-
                 <hr />
-                <Row>
-                    <Col>
-                        <Link className="btn btn-danger siroko" to={RoutesNames.KATEGORIJE_PREGLED}>
-                            Odustani
-                        </Link>
-                    </Col>
-                    <Col>
-                        <Button className="siroko" variant="primary" type="submit">
-                            Promjeni
-                        </Button>
-                    </Col>
-                </Row>
-
+                <Akcije odustani={RoutesNames.KATEGORIJE_PREGLED} akcija='Dodaj kategoriju' />
             </Form>
         </Container>
-
     );
 }

@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import {  Button, Container, Table } from "react-bootstrap";
-import KategorijaService from '../../services/KategorijaService';
+import Service from '../../services/KategorijaService';
 import { Link, useNavigate } from "react-router-dom";
 import {RoutesNames} from '../../constants'
+import { FaEdit, FaPizzaSlice, FaTrash } from "react-icons/fa";
+import { IoIosAdd } from "react-icons/io";
+import moment from "moment";
 
 
 export default function Kategorije(){
@@ -11,13 +14,12 @@ export default function Kategorije(){
 
 
     async function dohvatiKategorije(){
-        await KategorijaService.get()
-        .then((res)=>{
-            setKategorije(res);
-        })
-        .catch((e)=>{
-            alert(e);
-        });
+        const odgovor = await Service.get('Kategorije');
+        if(!odgovor.ok){
+            alert(Service.dohvatiPorukeAlert(odgovor.podaci));
+            return;
+        }
+        setKategorije(odgovor.podaci);
     }
 
     useEffect(()=>{
@@ -26,10 +28,9 @@ export default function Kategorije(){
 
 
     async function obrisiAsync(sifra){
-        const odgovor = await KategorijaService._delete(sifra);
+        const odgovor = await Service.obrisi('Kategorije',sifra);
         if (odgovor.greska){
-            console.log(odgovor.poruka);
-            alert('Pogledaj konzolu');
+            alert(Service.dohvatiPorukeAlert(odgovor.podaci));
             return;
         }
         dohvatiKategorije();
@@ -42,7 +43,9 @@ export default function Kategorije(){
     return (
 
         <Container>
-           <Link to={RoutesNames.KATEGORIJE_NOVI}> Dodaj </Link>
+           <Link to={RoutesNames.KATEGORIJE_NOVI} className="btn btn-success siroko">
+                <IoIosAdd size={25} /> 
+            </Link>
             <Table striped bordered hover responsive>
                 <thead>
                     <tr>
@@ -55,19 +58,14 @@ export default function Kategorije(){
                     {kategorije && kategorije.map((kategorija,index)=>(
                         <tr key={index}>
                             <td>{kategorija.naziv}</td>
-                            <td>{kategorija.vrijediOd}</td>  
+                            <td>{moment.utc(kategorija.vrijediOd).format('DD. MM. YYYY.')}</td>  
                             <td>
-                                <Button 
-                                onClick={()=>obrisi(kategorija.sifra)}
-                                variant='danger'
-                                >
-                                    Obriši
+                                <Button onClick={()=>obrisi(kategorija.sifra)} variant='danger'>
+                                     <FaTrash size={25} />
                                 </Button>
-
-                                <Button 
-                                onClick={()=>navigate(`/kategorije/${kategorija.sifra}`)}
-                                >
-                                    Promjeni
+                                <span> </span>
+                                <Button onClick={()=>navigate(`/kategorije/${kategorija.sifra}`)}>
+                                    <FaEdit size={25} />
                                 </Button>
                             </td>
                         </tr>
