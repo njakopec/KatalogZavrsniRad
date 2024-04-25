@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 import {  Button, Container, Table } from "react-bootstrap";
 import Service from '../../services/ProizvodService';
 import { Link, useNavigate } from "react-router-dom";
-import {RoutesNames} from '../../constants'
+import {App, RoutesNames} from '../../constants'
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { IoIosAdd } from "react-icons/io";
 import { NumericFormat } from "react-number-format";
 import useError from "../../hooks/useError";
+import nepoznato from '../../assets/nepoznato.png'; 
 
 
 export default function Proizvodi(){
@@ -43,6 +44,13 @@ export default function Proizvodi(){
         obrisiAsync(sifra);
     }
 
+    function slika(p){
+        if(p.slika!=null){
+            return App.URL + p.slika+ `?${Date.now()}`;
+        }
+        return nepoznato;
+      }
+
     return (
 
         <Container>
@@ -62,7 +70,7 @@ export default function Proizvodi(){
                 <tbody>
                     {proizvodi && proizvodi.map((proizvod,index)=>(
                         <tr key={index}>
-                            <td>{proizvod.naziv}</td>
+                            <td><img src={slika(proizvod)} style={{maxWidth: '50px'}} /> {proizvod.naziv}</td>
                             <td>{proizvod.kategorijaNaziv}</td> 
                             <td>{proizvod.tezina}</td> 
                             <td><NumericFormat 

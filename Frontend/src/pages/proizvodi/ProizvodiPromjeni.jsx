@@ -1,11 +1,14 @@
-import { Container, Form } from "react-bootstrap";
+import { Button, Col, Container, Form, Image, Row } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 import { RoutesNames } from "../../constants";
 import Service from "../../services/ProizvodService";
-import { useState, useEffect  } from "react";
+import { useState, useEffect, useRef  } from "react";
 import InputText from "../../components/InputText";
 import Akcije from "../../components/Akcije";
 import useError from "../../hooks/useError";
+import Cropper from 'react-cropper';
+import 'cropperjs/dist/cropper.css';
+import nepoznato from '../../assets/nepoznato.png'; 
 
 export default function ProizvodiPromjeni(){
     const navigate = useNavigate();
@@ -16,6 +19,11 @@ export default function ProizvodiPromjeni(){
     const [kategorijaSifra, setKategorijaSifra] = useState(0);
 
     const { prikaziError } = useError();
+
+    const [trenutnaSlika, setTrenutnaSlika] = useState('');
+    const [slikaZaCrop, setSlikaZaCrop] = useState('');
+    const [slikaZaServer, setSlikaZaServer] = useState('');
+    const cropperRef = useRef(null);
 
     async function dohvatiKategorije(){
         const odgovor = await Service.get('Kategorije');
@@ -35,6 +43,11 @@ export default function ProizvodiPromjeni(){
         }
         setProizvod(odgovor.podaci);
         setKategorijaSifra(odgovor.podaci.kategorijaSifra);
+        if(odgovor.podaci.slika!=null){
+            setTrenutnaSlika(App.URL + odgovor.podaci.slika + `?${Date.now()}`);
+          }else{
+            setTrenutnaSlika(nepoznato);
+          }
     }
 
     async function promjeni(proizvod){
@@ -51,6 +64,8 @@ export default function ProizvodiPromjeni(){
         ucitajProizvod();
     },[]);
 
+    
+
     function obradiSubmit(e){ 
         e.preventDefault();
         const podaci = new FormData(e.target);
@@ -61,6 +76,44 @@ export default function ProizvodiPromjeni(){
             cijena: parseFloat(podaci.get('cijena'))
         });
     }
+
+
+    
+  function onCrop() {
+    setSlikaZaServer(cropperRef.current.cropper.getCroppedCanvas().toDataURL());
+  }
+
+  function onChangeImage(e) {
+    e.preventDefault();
+
+    let files;
+    if (e.dataTransfer) {
+      files = e.dataTransfer.files;
+    } else if (e.target) {
+      files = e.target.files;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      setSlikaZaCrop(reader.result);
+    };
+    try {
+      reader.readAsDataURL(files[0]);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async function spremiSliku() {
+    const base64 = slikaZaServer;
+
+    const odgovor = await Service.postaviSliku(routeParams.sifra, {Base64: base64.replace('data:image/png;base64,', '')});
+    if(!odgovor.ok){
+      prikaziError(odgovor.podaci);
+    }
+    //Date.now je zbog toga što se src na image komponenti cache-ira
+    //pa kad promjenimo sliku url ostane isti i trenutna slika se ne updatea
+    setTrenutnaSlika(slikaZaServer);
+  }
 
     return (
         <Container>
@@ -81,6 +134,51 @@ export default function ProizvodiPromjeni(){
                 <hr />
                 <Akcije odustani={RoutesNames.PROIZVODI_PREGLED} akcija='Promjeni proizvod' />
             </Form>
+            <hr />
+            <Row className='mb-4'>
+              <Col key='1' sm={12} lg={6} md={12}>
+                <p className='form-label'>Trenutna slika</p>
+                <Image
+                  //za lokalni development
+                  //src={'https://edunovawp1.eu/' + trenutnaSlika}
+                  src={trenutnaSlika}
+                  className='slika'
+                />
+              </Col>
+              <Col key='2' sm={12} lg={6} md={12}>
+                {slikaZaServer && (
+                  <>
+                    <p className='form-label'>Nova slika</p>
+                    <Image
+                      src={slikaZaServer || slikaZaCrop}
+                      className='slika'
+                    />
+                  </>
+                )}
+              </Col>
+            </Row>
+            <hr />
+            <input className='mb-3' type='file' onChange={onChangeImage} />
+              <Button disabled={!slikaZaServer} onClick={spremiSliku}>
+                Spremi sliku
+              </Button>
+
+              <Cropper
+                src={slikaZaCrop}
+                style={{ height: 400, width: '100%' }}
+                initialAspectRatio={1}
+                guides={true}
+                viewMode={1}
+                minCropBoxWidth={50}
+                minCropBoxHeight={50}
+                cropBoxResizable={false}
+                background={false}
+                responsive={true}
+                checkOrientation={false}
+                cropstart={onCrop}
+                cropend={onCrop}
+                ref={cropperRef}
+              />
         </Container>
     );
 }
