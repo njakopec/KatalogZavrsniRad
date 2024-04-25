@@ -6,16 +6,19 @@ import { useState, useEffect  } from "react";
 import InputText from "../../components/InputText";
 import Akcije from "../../components/Akcije";
 import moment from "moment";
+import useError from "../../hooks/useError";
 
 export default function KategorijePromjeni(){
     const navigate = useNavigate();
     const routeParams = useParams();
     const [kategorija, setKategorija] = useState({});
 
+    const { prikaziError } = useError();
+
     async function ucitajKategorija(){
         const odgovor = await Service.getBySifra('Kategorije',routeParams.sifra);
         if(!odgovor.ok){
-            alert(Service.dohvatiPorukeAlert(odgovor.podaci));
+            prikaziError(odgovor.podaci);
             return;
         }
         setKategorija(odgovor.podaci);
@@ -24,7 +27,7 @@ export default function KategorijePromjeni(){
     async function promjeni(kategorija){
         const odgovor = await Service.promjeni('Kategorije',routeParams.sifra,kategorija);
         if(!odgovor.ok){
-            alert(Service.dohvatiPorukeAlert(odgovor.podaci));
+            prikaziError(odgovor.podaci);
             return;
         }
         navigate(RoutesNames.KATEGORIJE_PREGLED);

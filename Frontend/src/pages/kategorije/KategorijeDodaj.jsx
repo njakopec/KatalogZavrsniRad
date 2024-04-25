@@ -5,14 +5,17 @@ import Service from "../../services/KategorijaService";
 import moment from "moment";
 import InputText from "../../components/InputText";
 import Akcije from "../../components/Akcije";
+import useError from "../../hooks/useError";
 
 export default function KategorijeDodaj(){
     const navigate = useNavigate();
 
+    const { prikaziError } = useError();
+
     async function dodaj(kategorija){
         const odgovor = await Service.dodaj('Kategorije',kategorija);
         if(!odgovor.ok){
-            alert(Service.dohvatiPorukeAlert(odgovor.podaci));
+            prikaziError(odgovor.podaci);
             return;
         }
         navigate(RoutesNames.KATEGORIJE_PREGLED);

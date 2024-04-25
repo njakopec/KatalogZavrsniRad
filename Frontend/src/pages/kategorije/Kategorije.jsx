@@ -3,20 +3,23 @@ import {  Button, Container, Table } from "react-bootstrap";
 import Service from '../../services/KategorijaService';
 import { Link, useNavigate } from "react-router-dom";
 import {RoutesNames} from '../../constants'
-import { FaEdit, FaPizzaSlice, FaTrash } from "react-icons/fa";
+import { FaEdit, FaTrash } from "react-icons/fa";
 import { IoIosAdd } from "react-icons/io";
 import moment from "moment";
+import useError from "../../hooks/useError";
 
 
 export default function Kategorije(){
     const [kategorije,setKategorije] = useState();
     const navigate = useNavigate();
 
+    const { prikaziError } = useError();
+
 
     async function dohvatiKategorije(){
         const odgovor = await Service.get('Kategorije');
         if(!odgovor.ok){
-            alert(Service.dohvatiPorukeAlert(odgovor.podaci));
+            prikaziError(odgovor.podaci);
             return;
         }
         setKategorije(odgovor.podaci);
@@ -30,7 +33,7 @@ export default function Kategorije(){
     async function obrisiAsync(sifra){
         const odgovor = await Service.obrisi('Kategorije',sifra);
         if (odgovor.greska){
-            alert(Service.dohvatiPorukeAlert(odgovor.podaci));
+            prikaziError(odgovor.podaci);
             return;
         }
         dohvatiKategorije();

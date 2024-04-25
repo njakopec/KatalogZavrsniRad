@@ -5,6 +5,7 @@ import Service from "../../services/ProizvodService";
 import { useState, useEffect  } from "react";
 import InputText from "../../components/InputText";
 import Akcije from "../../components/Akcije";
+import useError from "../../hooks/useError";
 
 export default function ProizvodiPromjeni(){
     const navigate = useNavigate();
@@ -14,10 +15,12 @@ export default function ProizvodiPromjeni(){
     const [kategorije, setKategorije] = useState([]);
     const [kategorijaSifra, setKategorijaSifra] = useState(0);
 
+    const { prikaziError } = useError();
+
     async function dohvatiKategorije(){
         const odgovor = await Service.get('Kategorije');
         if(!odgovor.ok){
-          alert(Service.dohvatiPorukeAlert(odgovor.podaci));
+          prikaziError(odgovor.podaci);
           return;
         }
         setKategorije(odgovor.podaci);
@@ -27,7 +30,7 @@ export default function ProizvodiPromjeni(){
     async function ucitajProizvod(){
         const odgovor = await Service.getBySifra('Proizvodi',routeParams.sifra);
         if(!odgovor.ok){
-            alert(Service.dohvatiPorukeAlert(odgovor.podaci));
+            prikaziError(odgovor.podaci);
             return;
         }
         setProizvod(odgovor.podaci);
@@ -37,7 +40,7 @@ export default function ProizvodiPromjeni(){
     async function promjeni(proizvod){
         const odgovor = await Service.promjeni('Proizvodi',routeParams.sifra,proizvod);
         if(!odgovor.ok){
-            alert(Service.dohvatiPorukeAlert(odgovor.podaci));
+            prikaziError(odgovor.podaci);
             return;
         }
         navigate(RoutesNames.PROIZVODI_PREGLED);

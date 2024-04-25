@@ -5,6 +5,7 @@ import Service from "../../services/ProizvodService";
 import InputText from "../../components/InputText";
 import Akcije from "../../components/Akcije";
 import { useEffect, useState } from "react";
+import useError from "../../hooks/useError";
 
 export default function ProizvodiDodaj(){
     const navigate = useNavigate();
@@ -12,11 +13,13 @@ export default function ProizvodiDodaj(){
     const [kategorije, setKategorije] = useState([]);
     const [kategorijaSifra, setKategorijaSifra] = useState(0);
 
+    const { prikaziError } = useError();
+
     async function dohvatiKategorije(){
     
         const odgovor = await Service.get('Kategorije');
         if(!odgovor.ok){
-          alert(Service.dohvatiPorukeAlert(odgovor.podaci));
+          prikaziError(odgovor.podaci);
           return;
         }
         setKategorije(odgovor.podaci);
@@ -30,7 +33,7 @@ export default function ProizvodiDodaj(){
     async function dodaj(proizvod){
         const odgovor = await Service.dodaj('Proizvodi',proizvod);
         if(!odgovor.ok){
-            alert(Service.dohvatiPorukeAlert(odgovor.podaci));
+            prikaziError(odgovor.podaci);
             return;
         }
         navigate(RoutesNames.PROIZVODI_PREGLED);

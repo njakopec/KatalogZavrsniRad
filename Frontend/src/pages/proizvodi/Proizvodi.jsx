@@ -6,17 +6,20 @@ import {RoutesNames} from '../../constants'
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { IoIosAdd } from "react-icons/io";
 import { NumericFormat } from "react-number-format";
+import useError from "../../hooks/useError";
 
 
 export default function Proizvodi(){
     const [proizvodi,setProizvodi] = useState();
     const navigate = useNavigate();
 
+    const { prikaziError } = useError();
+
 
     async function dohvatiProizvodi(){
         const odgovor = await Service.get('Proizvodi');
         if(!odgovor.ok){
-            alert(Service.dohvatiPorukeAlert(odgovor.podaci));
+            prikaziError(odgovor.podaci);
             return;
         }
         setProizvodi(odgovor.podaci);
@@ -30,7 +33,7 @@ export default function Proizvodi(){
     async function obrisiAsync(sifra){
         const odgovor = await Service.obrisi('Proizvodi',sifra);
         if (odgovor.greska){
-            alert(Service.dohvatiPorukeAlert(odgovor.podaci));
+            prikaziError(odgovor.podaci);
             return;
         }
         dohvatiProizvodi();

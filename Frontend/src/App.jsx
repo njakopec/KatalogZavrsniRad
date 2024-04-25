@@ -14,10 +14,19 @@ import Proizvodi from "./pages/proizvodi/Proizvodi"
 import ProizvodiDodaj from "./pages/proizvodi/ProizvodiDodaj"
 import ProizvodiPromjeni from "./pages/proizvodi/ProizvodiPromjeni"
 
+import ErrorModal from './components/ErrorModal';
+import useError from "./hooks/useError"
+
+
+
 function App() {
+  
+  const { errors, prikaziErrorModal, sakrijError } = useError();
+
   return (
     <>
-    <NavBar />
+     <ErrorModal show={prikaziErrorModal} errors={errors} onHide={sakrijError} />
+     <NavBar />
       <Routes>
         <>
           <Route path={RoutesNames.HOME} element={<Pocetna />} />
