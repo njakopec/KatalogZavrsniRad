@@ -16,7 +16,8 @@ namespace Backend.Mappers
                     entitet.Naziv,
                     entitet.Kategorija.Naziv,
                     entitet.Tezina,
-                    entitet.Cijena));
+                    entitet.Cijena,
+                     PutanjaDatoteke(entitet)));
             }));
 
             MapperMapInsertUpdatedFromDTO = new Mapper(new MapperConfiguration(c =>{
@@ -32,6 +33,22 @@ namespace Backend.Mappers
                      entitet.Tezina,
                      entitet.Cijena));
              }));
+        }
+
+        private static string PutanjaDatoteke(Proizvod e)
+        {
+            try
+            {
+                var ds = Path.DirectorySeparatorChar;
+                string slika = Path.Combine(Directory.GetCurrentDirectory()
+                    + ds + "wwwroot" + ds + "slike" + ds + "proizvodi" + ds + e.Sifra + ".png");
+                return File.Exists(slika) ? "/slike/proizvodi/" + e.Sifra + ".png" : null;
+            }
+            catch
+            {
+                return null;
+            }
+
         }
 
 
