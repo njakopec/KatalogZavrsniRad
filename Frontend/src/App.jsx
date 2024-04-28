@@ -16,6 +16,7 @@ import ProizvodiPromjeni from "./pages/proizvodi/ProizvodiPromjeni"
 
 import ErrorModal from './components/ErrorModal';
 import useError from "./hooks/useError"
+import LoadingSpinner from './components/LoadingSpinner'
 
 
 
@@ -26,6 +27,7 @@ function App() {
   return (
     <>
      <ErrorModal show={prikaziErrorModal} errors={errors} onHide={sakrijError} />
+     <LoadingSpinner />
      <NavBar />
       <Routes>
         <>
