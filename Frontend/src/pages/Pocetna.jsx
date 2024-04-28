@@ -5,7 +5,7 @@ export default function Pocetna(){
     return(
         <>
         <Container>
-            Dobro dosli na Webtrgovina aplikaciju
+            Dobro dosli na aplikaciju za evidenciju kategorija i proizvoda
         </Container>        
         </>
     );
