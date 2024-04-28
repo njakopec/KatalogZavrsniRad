@@ -6,6 +6,7 @@ import InputText from "../../components/InputText";
 import Akcije from "../../components/Akcije";
 import { useEffect, useState } from "react";
 import useError from "../../hooks/useError";
+import useLoading from "../../hooks/useLoading";
 
 export default function ProizvodiDodaj(){
     const navigate = useNavigate();
@@ -14,10 +15,12 @@ export default function ProizvodiDodaj(){
     const [kategorijaSifra, setKategorijaSifra] = useState(0);
 
     const { prikaziError } = useError();
+    const { showLoading, hideLoading } = useLoading();
 
     async function dohvatiKategorije(){
-    
+        showLoading();
         const odgovor = await Service.get('Kategorije');
+        hideLoading();
         if(!odgovor.ok){
           prikaziError(odgovor.podaci);
           return;
@@ -31,7 +34,9 @@ export default function ProizvodiDodaj(){
     },[]);
 
     async function dodaj(proizvod){
+        showLoading();
         const odgovor = await Service.dodaj('Proizvodi',proizvod);
+        hideLoading();
         if(!odgovor.ok){
             prikaziError(odgovor.podaci);
             return;

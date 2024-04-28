@@ -8,6 +8,7 @@ import { IoIosAdd } from "react-icons/io";
 import { NumericFormat } from "react-number-format";
 import useError from "../../hooks/useError";
 import nepoznato from '../../assets/nepoznato.png'; 
+import useLoading from "../../hooks/useLoading";
 
 
 export default function Proizvodi(){
@@ -15,10 +16,13 @@ export default function Proizvodi(){
     const navigate = useNavigate();
 
     const { prikaziError } = useError();
+    const { showLoading, hideLoading } = useLoading();
 
 
     async function dohvatiProizvodi(){
+        showLoading();
         const odgovor = await Service.get('Proizvodi');
+        hideLoading();
         if(!odgovor.ok){
             prikaziError(odgovor.podaci);
             return;
@@ -32,7 +36,9 @@ export default function Proizvodi(){
 
 
     async function obrisiAsync(sifra){
+        showLoading();
         const odgovor = await Service.obrisi('Proizvodi',sifra);
+        hideLoading();
         prikaziError(odgovor.podaci);
         dohvatiProizvodi();
     }

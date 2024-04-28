@@ -9,6 +9,7 @@ import useError from "../../hooks/useError";
 import Cropper from 'react-cropper';
 import 'cropperjs/dist/cropper.css';
 import nepoznato from '../../assets/nepoznato.png'; 
+import useLoading from "../../hooks/useLoading";
 
 export default function ProizvodiPromjeni(){
     const navigate = useNavigate();
@@ -19,6 +20,7 @@ export default function ProizvodiPromjeni(){
     const [kategorijaSifra, setKategorijaSifra] = useState(0);
 
     const { prikaziError } = useError();
+    const { showLoading, hideLoading } = useLoading();
 
     const [trenutnaSlika, setTrenutnaSlika] = useState('');
     const [slikaZaCrop, setSlikaZaCrop] = useState('');
@@ -51,7 +53,9 @@ export default function ProizvodiPromjeni(){
     }
 
     async function promjeni(proizvod){
+        showLoading();
         const odgovor = await Service.promjeni('Proizvodi',routeParams.sifra,proizvod);
+        hideLoading();
         if(!odgovor.ok){
             prikaziError(odgovor.podaci);
             return;
@@ -60,8 +64,10 @@ export default function ProizvodiPromjeni(){
     }
 
     useEffect(()=>{
+        showLoading();
         dohvatiKategorije();
         ucitajProizvod();
+        hideLoading();
     },[]);
 
     
@@ -105,8 +111,9 @@ export default function ProizvodiPromjeni(){
 
   async function spremiSliku() {
     const base64 = slikaZaServer;
-
+    showLoading();
     const odgovor = await Service.postaviSliku(routeParams.sifra, {Base64: base64.replace('data:image/png;base64,', '')});
+    hideLoading();
     if(!odgovor.ok){
       prikaziError(odgovor.podaci);
     }

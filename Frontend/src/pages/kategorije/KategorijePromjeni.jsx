@@ -7,6 +7,7 @@ import InputText from "../../components/InputText";
 import Akcije from "../../components/Akcije";
 import moment from "moment";
 import useError from "../../hooks/useError";
+import useLoading from "../../hooks/useLoading";
 
 export default function KategorijePromjeni(){
     const navigate = useNavigate();
@@ -14,9 +15,12 @@ export default function KategorijePromjeni(){
     const [kategorija, setKategorija] = useState({});
 
     const { prikaziError } = useError();
+    const { showLoading, hideLoading } = useLoading();
 
     async function ucitajKategorija(){
+        showLoading();
         const odgovor = await Service.getBySifra('Kategorije',routeParams.sifra);
+        hideLoading();
         if(!odgovor.ok){
             prikaziError(odgovor.podaci);
             return;
@@ -26,7 +30,9 @@ export default function KategorijePromjeni(){
     }
 
     async function promjeni(kategorija){
+        showLoading();
         const odgovor = await Service.promjeni('Kategorije',routeParams.sifra,kategorija);
+        hideLoading();
         if(!odgovor.ok){
             prikaziError(odgovor.podaci);
             return;

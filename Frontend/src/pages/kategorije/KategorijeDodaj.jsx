@@ -6,14 +6,18 @@ import moment from "moment";
 import InputText from "../../components/InputText";
 import Akcije from "../../components/Akcije";
 import useError from "../../hooks/useError";
+import useLoading from "../../hooks/useLoading";
 
 export default function KategorijeDodaj(){
     const navigate = useNavigate();
 
     const { prikaziError } = useError();
+    const { showLoading, hideLoading } = useLoading();
 
     async function dodaj(kategorija){
+        showLoading();
         const odgovor = await Service.dodaj('Kategorije',kategorija);
+        hideLoading();
         if(!odgovor.ok){
             prikaziError(odgovor.podaci);
             return;
