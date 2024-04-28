@@ -117,6 +117,11 @@ export default function ProizvodiPromjeni(){
 
     return (
         <Container>
+          <Row>
+            <Col key='1' sm={12} lg={6} md={6}>
+
+            
+           
             <Form onSubmit={obradiSubmit}>
                 <InputText atribut='naziv' vrijednost={proizvod.naziv} />
                 <Form.Group className='mb-3' controlId='smjer'>
@@ -131,13 +136,9 @@ export default function ProizvodiPromjeni(){
                 </Form.Group>
                 <InputText atribut='tezina' vrijednost={proizvod.tezina} />
                 <InputText atribut='cijena' vrijednost={proizvod.cijena} />
-                <hr />
-                <Akcije odustani={RoutesNames.PROIZVODI_PREGLED} akcija='Promjeni proizvod' />
-            </Form>
-            <hr />
-            <Row className='mb-4'>
+                <Row>
               <Col key='1' sm={12} lg={6} md={12}>
-                <p className='form-label'>Trenutna slika</p>
+              <p className='form-label'>Trenutna slika</p>
                 <Image
                   //za lokalni development
                   //src={'https://edunovawp1.eu/' + trenutnaSlika}
@@ -157,7 +158,11 @@ export default function ProizvodiPromjeni(){
                 )}
               </Col>
             </Row>
-            <hr />
+                <hr />
+                <Akcije odustani={RoutesNames.PROIZVODI_PREGLED} akcija='Promjeni proizvod' />
+            </Form>
+            </Col>
+            <Col key='2' sm={12} lg={6} md={6}>
             <input className='mb-3' type='file' onChange={onChangeImage} />
               <Button disabled={!slikaZaServer} onClick={spremiSliku}>
                 Spremi sliku
@@ -179,6 +184,11 @@ export default function ProizvodiPromjeni(){
                 cropend={onCrop}
                 ref={cropperRef}
               />
+            </Col>
+            </Row>
+         
+           
+           
         </Container>
     );
 }
