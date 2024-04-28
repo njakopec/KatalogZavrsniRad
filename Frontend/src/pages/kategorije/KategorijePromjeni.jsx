@@ -21,6 +21,7 @@ export default function KategorijePromjeni(){
             prikaziError(odgovor.podaci);
             return;
         }
+        odgovor.podaci.vrijediOd=moment.utc(odgovor.podaci.vrijediOd).format('YYYY-MM-DD');
         setKategorija(odgovor.podaci);
     }
 
@@ -55,7 +56,7 @@ export default function KategorijePromjeni(){
                     <Form.Control type="date" name="vrijediOd" defaultValue={kategorija.vrijediOd} />
                 </Form.Group>
                 <hr />
-                <Akcije odustani={RoutesNames.KATEGORIJE_PREGLED} akcija='Dodaj kategoriju' />
+                <Akcije odustani={RoutesNames.KATEGORIJE_PREGLED} akcija='Promjeni kategoriju' />
             </Form>
         </Container>
     );

@@ -32,7 +32,7 @@ export default function Kategorije(){
 
     async function obrisiAsync(sifra){
         const odgovor = await Service.obrisi('Kategorije',sifra);
-        if (odgovor.greska){
+        if (!odgovor.ok){
             prikaziError(odgovor.podaci);
             return;
         }

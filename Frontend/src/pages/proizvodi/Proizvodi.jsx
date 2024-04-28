@@ -33,10 +33,7 @@ export default function Proizvodi(){
 
     async function obrisiAsync(sifra){
         const odgovor = await Service.obrisi('Proizvodi',sifra);
-        if (odgovor.greska){
-            prikaziError(odgovor.podaci);
-            return;
-        }
+        prikaziError(odgovor.podaci);
         dohvatiProizvodi();
     }
 
